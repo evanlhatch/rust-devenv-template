@@ -1,7 +1,6 @@
 # Unified treefmt configuration (sheath pattern).
 # Run: treefmt  (or via pre-commit hook). dprint reads .dprint.json
-# (plugin URLs, shadow-empire pattern) — no dprint.json config needed in
-# treefmt; the binary resolves plugins itself.
+# (plugin URLs, shadow-empire pattern).
 
 [global]
 excludes = [
@@ -12,6 +11,10 @@ excludes = [
     "result",
     "result-*",
     "*.lock",
+    # Vendored/synced code (patches/) — upstream bytes stay untouched.
+    "patches/**",
+    "dprint.json",
+    ".dprint.json",
 ]
 
 # rustfmt for Rust; dprint (via .dprint.json) handles JSON/TOML/YAML/MD.

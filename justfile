@@ -53,3 +53,12 @@ mutants name:
 # devenv state (DEVENV_STATE/bolero-corpus).
 fuzz name:
 	cargo bolero run {{name}}
+
+# ── WASM compile checks (nightly + rust-src required) ────────────────
+# RUSTFLAGS_WASIP3/RUSTFLAGS_WASM32 strip host-only flags (target-cpu=native,
+# -Z*); these are the real gates for "does it build for wasm" without a link.
+check-wasip3:
+	RUSTFLAGS="$RUSTFLAGS_WASIP3" cargo check --target wasm32-wasip3 -Z build-std=std,panic_abort
+
+check-wasm:
+	RUSTFLAGS="$RUSTFLAGS_WASM32" cargo check --target wasm32-unknown-unknown

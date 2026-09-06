@@ -94,6 +94,16 @@
     # RUSTC_WRAPPER intentionally not set — workspaces manage sccache via
     # .cargo/config.toml (avoids "server not running"; starts on demand).
 
+    # WASM builds: the dev rustflags carry `-C target-cpu=native` + host
+    # -Z flags that break wasm targets. Use this set instead (wasmtron
+    # pattern) via `just check-wasip3` / `just check-wasm`.
+    RUSTFLAGS_WASIP3 = lib.concatStringsSep " " [
+      "-C lto=no"
+      "-C panic=abort"
+      "-C debuginfo=1"
+    ];
+    RUSTFLAGS_WASM32 = "-C lto=no -C panic=abort -C debuginfo=1";
+
     # nexttest default runner
     CARGO_TEST_RUNNER = "nextest";
     NEXTEST_PROFILE = "default";
@@ -119,9 +129,9 @@
     '';
   };
 
-  # ── Pre-commit hooks (format/hygiene live in dev/formatters.nix) ──
+  # ── git-hooks (format/hygiene live in dev/formatters.nix) ──
   # git-commit env lacks cc/PATH, so wrap clippy with the compiler bins.
-  pre-commit.hooks = {
+  git-hooks.hooks = {
     clippy = {
       enable = true;
       entry = ''

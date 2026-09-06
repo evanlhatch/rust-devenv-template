@@ -1,8 +1,8 @@
 [package]
 name = "myproj"
 version = "0.1.0"
-edition = "2024"
 authors = ["evan"]
+edition = "2024"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
@@ -15,16 +15,16 @@ log = { version = "0.4", features = ["kv"] }
 asyncband = "0.7"
 
 # Data structures
-parking_lot = "0.12"
+ahash = "0.8" # HashMap/HashSet — deterministic iteration (std banned in clippy.toml)
 arc-swap = "1.7"
 ecow = "0.3" # clone-on-write vec/string/bytes — prefer over smallvec
 itertools = "0.14"
-ahash = "0.8" # HashMap/HashSet — deterministic iteration (std banned in clippy.toml)
+parking_lot = "0.12"
 
 # Derive / ergonomics
 bon = "3" # builder patterns
-strum = { version = "0.26", features = ["derive"] }
 derive_more = { version = "1.0", features = ["display"] }
+strum = { version = "0.26", features = ["derive"] }
 
 # Paths + IO with real error messages
 camino = "1.2"
@@ -33,8 +33,8 @@ fs-err = "3.3"
 serde = { version = "1.0", features = ["derive"] }
 
 [dev-dependencies]
-insta = "1" # snapshot tests
 bolero = "0.13" # property/fuzz tests
+insta = "1" # snapshot tests
 
 [lints.rust]
 # Fail on lints we don't know about (nightly gains them regularly).
@@ -160,3 +160,11 @@ lto = "off"
 codegen-units = 16
 debug = false
 strip = "symbols"
+
+[patch.crates-io]
+# getrandom 0.3.4 (transitive via ahash etc.) hard-compile_errors on
+# wasm32-wasip3 ("only previews 1 and 2 are supported"). Vendored copy with
+# a wasi_p3 backend added (wasmtron pattern; see
+# patches/getrandom-0.3.4/src/backends/wasi_p3.rs). Only reachable on the
+# p3 target; every other target's code path is untouched upstream code.
+getrandom = { path = "patches/getrandom-0.3.4" }

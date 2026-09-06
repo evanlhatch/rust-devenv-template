@@ -59,14 +59,13 @@ in
     '';
     tasks."devenv:treefmt:run".before = lib.mkForce [ ];
 
-    # Pre-commit: format + hygiene (code checks live in lang/rust.nix).
+    # git-hooks (devenv 2.x first-class): format + hygiene.
     # Hooks run from the raw `git commit` env (not the devenv shell), so
     # treefmt can't find rustfmt/dprint by name — wrap the entry with a
     # PATH containing every formatter it dispatches to.
-    pre-commit.hooks = {
+    git-hooks.hooks = {
       treefmt = {
         enable = true;
-        package = pkgs.treefmt;
         settings.fail-on-change = true;
         entry = ''
           ${pkgs.writeShellScript "treefmt-hook" ''

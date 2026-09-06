@@ -25,3 +25,8 @@ node_modules/
 
 # Scratch
 /scratch/
+
+# Vendored crates (patches/) — drop cargo registry metadata
+.cargo-ok
+.cargo_vcs_info.json
+patches/*/target/

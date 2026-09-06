@@ -44,7 +44,7 @@ in
     ];
 
     # Dependency hygiene hooks.
-    pre-commit.hooks = {
+    git-hooks.hooks = {
       uv-check.enable = true; # pyproject.toml is valid
       uv-lock.enable = true; # uv.lock is up to date
     };

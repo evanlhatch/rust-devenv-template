@@ -11,10 +11,13 @@
     "excludes": [
         "target/**/*",
         "target-fix/**/*",
+        "patches/**/*",
         ".git/**/*",
         ".direnv/**/*",
         ".devenv/**/*",
-        "*.lock"
+        "*.lock",
+        "dprint.json",
+        ".dprint.json"
     ],
     "plugins": [
         "https://plugins.dprint.dev/json-0.23.0.wasm",
