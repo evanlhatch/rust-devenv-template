@@ -2,5 +2,72 @@
 name = "myproj"
 version = "0.1.0"
 edition = "2024"
+authors = ["evan"]
+license = "MIT OR Apache-2.0"
 
 [dependencies]
+# Errors/observability: fast-observe IS the error tool. No thiserror,
+# no anyhow, no eyre — define faults with fast-observe, flow with `?`.
+fast-observe = "0.1"
+log = { version = "0.4", features = ["kv"] }
+
+# Data structures
+parking_lot = "0.12"
+arc-swap = "1.7"
+ecow = "0.3" # clone-on-write vec/string/bytes — prefer over smallvec
+itertools = "0.14"
+
+# Derive / ergonomics
+bon = "3" # builder patterns
+strum = { version = "0.26", features = ["derive"] }
+derive_more = { version = "1.0", features = ["display"] }
+
+# Paths + IO with real error messages
+camino = "1.2"
+fs-err = "3.3"
+
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+insta = "1" # snapshot tests
+bolero = "0.13" # property/fuzz tests
+
+[lints.rust]
+unsafe_code = "deny"
+unused_imports = "warn"
+unused_variables = "warn"
+dead_code = "warn"
+unconditional_recursion = "deny"
+redundant_semicolons = "deny"
+unused_must_use = "deny"
+trivial_numeric_casts = "warn"
+unused_lifetimes = "warn"
+unused_qualifications = "warn"
+variant_size_differences = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "deny"
+dbg_macro = "deny"
+
+# ── Low-noise correctness/hygiene lints ─────────────────────────────
+# `let _ = mutex.lock()` unlocks instantly — always a bug.
+let_underscore_lock = "deny"
+# No new #[allow] without reason = "...".
+allow_attributes_without_reason = "warn"
+semicolon_if_nothing_returned = "warn"
+unnecessary_wraps = "warn"
+# .unwrap_or(f()) should be .unwrap_or_else(|| f()) for non-const fns.
+or_fun_call = "warn"
+# .clone() on refs / unnecessary clones.
+redundant_clone = "warn"
+# No silent type narrowing: prefer From/TryFrom over `as`.
+cast_lossless = "warn"
+# filter_map(|x| x.ok()) → flatten().
+manual_flatten = "warn"
+# let x = expr; x → expr.
+let_and_return = "warn"
+redundant_pub_crate = "warn"

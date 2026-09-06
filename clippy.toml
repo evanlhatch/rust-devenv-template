@@ -1,0 +1,10 @@
+# Workspace-wide Clippy configuration.
+#
+# Add project-specific `disallowed-methods` / `disallowed-types` here as
+# the project accrues invariants — every entry names its replacement.
+
+# Example (from real projects — uncomment and adapt):
+# disallowed-methods = [
+#     { path = "std::time::Instant::now", reason = "use the crate clock facade; std Instant panics on wasm32" },
+#     { path = "std::time::SystemTime::now", reason = "wall-clock never appears in output; use the crate clock for elapsed" },
+# ]
