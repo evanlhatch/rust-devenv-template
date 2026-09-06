@@ -120,13 +120,30 @@
   };
 
   # ── Pre-commit hooks (format/hygiene live in dev/formatters.nix) ──
+  # git-commit env lacks cc/PATH, so wrap clippy with the compiler bins.
   pre-commit.hooks = {
-    clippy.enable = true;
+    clippy = {
+      enable = true;
+      entry = ''
+        ${pkgs.writeShellScript "clippy-hook" ''
+          # fast-observe macro crate requires nightly (proc_macro_diagnostic),
+          # so use the devenv nightly toolchain's clippy (+ its cc/lld links).
+          export PATH="${lib.makeBinPath (with pkgs; [ stdenv.cc lld binutils ])}:${config.env.DEVENV_ROOT}/.devenv/profile/bin:$PATH"
+          exec cargo-clippy clippy --all-targets --all-features "$@"
+        ''}
+      '';
+    };
     check-merge-conflicts.enable = true;
     forbid-new-submodules.enable = true;
     cargo-deny = {
       enable = true;
-      entry = "${pkgs.cargo-deny}/bin/cargo-deny check";
+      pass_filenames = false; # deny does not accept file args
+      entry = ''
+        ${pkgs.writeShellScript "cargo-deny-hook" ''
+          export PATH="${config.env.DEVENV_ROOT}/.devenv/profile/bin:$PATH"
+          exec ${pkgs.cargo-deny}/bin/cargo-deny check
+        ''}
+      '';
     };
   };
 

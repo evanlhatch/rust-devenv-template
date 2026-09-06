@@ -1,19 +1,29 @@
-{ pkgs, ... }:
+# JavaScript (node + bun). OPT-IN: templateConfig.languages.js.enable.
+{ pkgs, lib, config, ... }:
+let
+  cfg = config.templateConfig.languages.js;
+in
 {
-  languages.javascript = {
-    enable = true;
-    package = pkgs.nodejs-slim;
+  options.templateConfig.languages.js.enable = lib.mkEnableOption "javascript (node + bun)" // {
+    default = false;
+  };
 
-    # Bun as the primary JS runtime + package manager
-    bun = {
+  config = lib.mkIf cfg.enable {
+    languages.javascript = {
       enable = true;
-      package = pkgs.bun;
-      install.enable = false;
-    };
+      package = pkgs.nodejs-slim;
 
-    npm.enable = false;
-    pnpm.enable = false;
-    yarn.enable = false;
-    corepack.enable = false;
+      # Bun as the primary JS runtime + package manager
+      bun = {
+        enable = true;
+        package = pkgs.bun;
+        install.enable = false;
+      };
+
+      npm.enable = false;
+      pnpm.enable = false;
+      yarn.enable = false;
+      corepack.enable = false;
+    };
   };
 }

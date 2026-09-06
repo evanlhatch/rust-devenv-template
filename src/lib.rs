@@ -1,7 +1,5 @@
-//! Crate root. Feature gates for fast-observe are declared here —
-//! nightly features, tracked in fast-observe's README.
-#![feature(error_generic_member_access)]
-
-pub mod errors;
-
-pub use errors::AppError;
+//! myproj — template crate.
+//!
+//! The fast-observe base wiring lives in `src/main.rs` (same shape as
+//! fast-observe's `examples/demo.rs`); the library is intentionally thin
+//! until the project has real shared types.

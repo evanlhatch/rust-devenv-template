@@ -60,8 +60,21 @@ in
     tasks."devenv:treefmt:run".before = lib.mkForce [ ];
 
     # Pre-commit: format + hygiene (code checks live in lang/rust.nix).
+    # Hooks run from the raw `git commit` env (not the devenv shell), so
+    # treefmt can't find rustfmt/dprint by name — wrap the entry with a
+    # PATH containing every formatter it dispatches to.
     pre-commit.hooks = {
-      treefmt.enable = true;
+      treefmt = {
+        enable = true;
+        package = pkgs.treefmt;
+        settings.fail-on-change = true;
+        entry = ''
+          ${pkgs.writeShellScript "treefmt-hook" ''
+            export PATH="${lib.makeBinPath (with pkgs; [ treefmt rustfmt dprint typos ])}:$PATH"
+            exec ${pkgs.treefmt}/bin/treefmt --fail-on-change --no-cache "$@"
+          ''}
+        '';
+      };
       typos.enable = true;
       ripsecrets.enable = true;
     };

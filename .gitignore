@@ -6,7 +6,7 @@ target-fix/
 .devenv*/
 .direnv/
 result*
-/pre-commit-config.yaml
+/.pre-commit-config.yaml
 devenv.local.nix
 
 # Local env + secrets

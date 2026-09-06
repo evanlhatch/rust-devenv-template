@@ -11,11 +11,11 @@ let
       entries = builtins.readDir dir;
       processEntry =
         name: type:
-        if builtins.hasPrefix "_" name then
+        if lib.hasPrefix "_" name then
           [ ]
         else if type == "directory" then
           findModules (dir + "/${name}")
-        else if builtins.hasSuffix ".nix" name then
+        else if lib.hasSuffix ".nix" name then
           [ (dir + "/${name}") ]
         else
           [ ];

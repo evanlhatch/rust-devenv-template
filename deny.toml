@@ -6,10 +6,13 @@ yanked = "deny"
 
 [bans]
 # Error handling — fast-observe only, never thiserror/anyhow/eyre.
+# v2 syntax: { crate = "name", reason/wrappers/... }.
 deny = [
-    { name = "thiserror", deny = true },
-    { name = "anyhow", deny = true },
-    { name = "eyre", deny = true },
+    { crate = "thiserror", reason = "fast-observe is the error tool" },
+    # anyhow: bolero's fuzz harness needs it (dev) — 1.x allowed via the
+    # crate spec; ban any newer major.
+    { crate = "anyhow@>=2", reason = "fast-observe is the error tool; bolero (dev) pins anyhow 1" },
+    { crate = "eyre", reason = "fast-observe is the error tool" },
 ]
 multiple-versions = "warn"
 wildcards = "deny"
@@ -30,15 +33,8 @@ allow = [
     "CC0-1.0",
     "MPL-2.0",
 ]
-deny = [
-    "GPL-2.0",
-    "GPL-3.0",
-    "LGPL-2.0",
-    "LGPL-3.0",
-    "AGPL-3.0",
-    "EUPL-1.2",
-    "SSPL-1.0",
-]
+# No `deny` list — licenses not in `allow` are reported (PR #611 removed
+# licenses.deny; allow-list-only semantics).
 
 [sources]
 unknown-registry = "deny"

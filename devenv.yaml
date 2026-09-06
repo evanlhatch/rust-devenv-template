@@ -1,22 +1,22 @@
 inputs:
-  nixpkgs:
-    url: github:cachix/devenv-nixpkgs/rolling
-  git-hooks:
-    url: github:cachix/git-hooks.nix
-    inputs:
-      nixpkgs:
-        follows: nixpkgs
-  rust-overlay:
-    url: github:oxalica/rust-overlay
-    inputs:
-      nixpkgs:
-        follows: nixpkgs
+    nixpkgs:
+        url: github:cachix/devenv-nixpkgs/rolling
+    git-hooks:
+        url: github:cachix/git-hooks.nix
+        inputs:
+            nixpkgs:
+                follows: nixpkgs
+    rust-overlay:
+        url: github:oxalica/rust-overlay
+        inputs:
+            nixpkgs:
+                follows: nixpkgs
 
 # SecretSpec: secrets declared in secretspec.toml, provisioned per env.
 # Best practice (devenv docs): load at RUNTIME via `secretspec run -- <cmd>`
 # — never export into the shell env. Provider: dotenv = repo-root .env
 # (gitignored); swap to keyring/1password without touching consumers.
 secretspec:
-  enable: true
-  provider: dotenv
-  profile: default
+    enable: true
+    provider: dotenv
+    profile: default

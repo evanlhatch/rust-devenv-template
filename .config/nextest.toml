@@ -6,7 +6,6 @@
 # tests with a `threads-required = "num-test-threads"` override.
 
 [profile.default]
-
 # Example (uncomment and adapt per test name):
 # [[profile.default.overrides]]
 # filter = "test(stays_fast)"

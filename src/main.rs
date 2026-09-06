@@ -1,41 +1,52 @@
-//! Binary entrypoint — fast-observe base wiring.
+//! Binary — fast-observe base wiring.
 //!
 //! `init()` is zero-config: stdout logs + fastrace console reporter.
-//! `#[fast_observe::main]` renders a full fault report + sysexits-style
-//! exit code when the future/main errors out.
+//! Run with no args to see the deterministic fault report.
 
-#![feature(error_generic_member_access)]
+#![feature(error_generic_member_access)] // error! emits Error::provide
 
 use fast_observe::prelude::*;
-use myproj::AppError;
 
+error! {
+    /// Errors the application can fail with.
+    pub enum AppError {
+        /// check the path exists and is readable
+        #[error("config unreadable: {path}")]
+        #[code = "E100", category = Content]
+        ConfigUnreadable {
+            /// The path we tried to read.
+            path: String,
+        },
+        /// The underlying I/O failure.
+        #[error("io: {0}")]
+        #[code = "E101", category = Transient, advice = "retry; if persistent, check the disk"]
+        #[from]
+        Io(std::io::Error),
+    }
+}
+
+/// Load a config file, failing with a typed `Content` fault on an empty
+/// path and a `Transient` fault on I/O errors.
 fn load_config(path: &str) -> Result<String, AppError> {
-    let _span = scope!("app.load_config"); // profiling span + error context
-    log::info!(path = path; "loading config");
-
+    let _span = scope!("app.load_config");
     ensure!(
         !path.is_empty(),
-        AppError::ConfigUnreadable {
+        ConfigUnreadable {
             path: path.to_owned()
         }
     );
-
-    // `#[from] Io` wires io::Error → AppError; `?` lifts it into the fault.
-    std::fs::read_to_string(path).map_err(AppError::from)
+    // `#[from]` wires io::Error → AppError; `?` lifts it into the fault.
+    std::fs::read_to_string(path)
+        .map_err(AppError::from)
+        .map_err(|e| Fault::from(e).attach_key("path", path.to_owned()))
 }
 
-#[fast_observe::main]
 fn main() {
     init();
 
     let path = std::env::args().nth(1).unwrap_or_default();
-    let _span = scope!("app.main");
-
     match load_config(&path) {
         Ok(contents) => log::info!(bytes = contents.len(); "config loaded"),
-        Err(fault) => {
-            // Deterministic one-fact-per-line report.
-            print!("{}", render_report(&fault));
-        }
+        Err(fault) => print!("{}", render_report(&fault)),
     }
 }

@@ -2,10 +2,10 @@
 # yek also respects .gitignore; these are extras.
 
 ignore_patterns:
-  - "target/**"
-  - "target-fix/**"
-  - ".devenv/**"
-  - ".direnv/**"
-  - "result*"
-  - "notes/**"
-  - "*.lock"
+    - "target/**"
+    - "target-fix/**"
+    - ".devenv/**"
+    - ".direnv/**"
+    - "result*"
+    - "notes/**"
+    - "*.lock"
