@@ -12,6 +12,9 @@ inputs:
             nixpkgs:
                 follows: nixpkgs
 
+# Enforce a recent CLI: `.envrc` eval-cache + `devenv hook` need >= 2.1.
+require_version: ">=2.2"
+
 # SecretSpec: secrets declared in secretspec.toml (see that file for
 # providers). Load at RUNTIME via `secretspec run -- <cmd>` — never export
 # into the shell env. dotenv = repo-root .env (gitignored).

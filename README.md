@@ -7,9 +7,13 @@ read `devenv/` for how things are wired.
 
 ```sh
 gh repo create myproj --template evanlhatch/rust-devenv-template --clone
-direnv allow        # or: devenv shell
+direnv allow        # or: devenv shell; or no-direnv cd activation
 just check
 ```
+
+No direnv? devenv 2.1+ does cd-activation itself — add to your shell
+config: `eval "$(devenv hook bash)"` (zsh/fish/nushell variants exist),
+then `devenv allow` in the project.
 
 ## Conventions (short version)
 
