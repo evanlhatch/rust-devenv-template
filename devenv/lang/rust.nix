@@ -1,5 +1,10 @@
 # Rust language module — always on.
 { pkgs, config, lib, ... }:
+let
+  lib' = import ../_lib.nix { inherit pkgs lib config; };
+  mkHook = lib'.mkHook;
+  mkToggle = lib'.mkToggle;
+in
 {
   languages.rust = {
     enable = true;
@@ -130,17 +135,18 @@
   };
 
   # ── git-hooks (format/hygiene live in dev/formatters.nix) ──
-  # git-commit env lacks cc/PATH, so wrap clippy with the compiler bins.
+  # git-commit env lacks cc/PATH, so wrap clippy with the compiler bins
+  # (mkHook from _lib.nix; the nightly toolchain lives in .devenv/profile).
   git-hooks.hooks = {
     clippy = {
       enable = true;
       entry = ''
-        ${pkgs.writeShellScript "clippy-hook" ''
-          # fast-observe macro crate requires nightly (proc_macro_diagnostic),
-          # so use the devenv nightly toolchain's clippy (+ its cc/lld links).
-          export PATH="${lib.makeBinPath (with pkgs; [ stdenv.cc lld binutils ])}:${config.env.DEVENV_ROOT}/.devenv/profile/bin:$PATH"
-          exec cargo-clippy clippy --all-targets --all-features "$@"
-        ''}
+        ${mkHook {
+          command = "cargo-clippy";
+          bins = with pkgs; [ stdenv.cc lld binutils ];
+          paths = [ "${config.env.DEVENV_ROOT}/.devenv/profile/bin" ];
+          args = "clippy --all-targets --all-features";
+        }}
       '';
     };
     check-merge-conflicts.enable = true;
@@ -149,10 +155,11 @@
       enable = true;
       pass_filenames = false; # deny does not accept file args
       entry = ''
-        ${pkgs.writeShellScript "cargo-deny-hook" ''
-          export PATH="${config.env.DEVENV_ROOT}/.devenv/profile/bin:$PATH"
-          exec ${pkgs.cargo-deny}/bin/cargo-deny check
-        ''}
+        ${mkHook {
+          command = "${pkgs.cargo-deny}/bin/cargo-deny";
+          paths = [ "${config.env.DEVENV_ROOT}/.devenv/profile/bin" ];
+          args = "check";
+        }}
       '';
     };
   };

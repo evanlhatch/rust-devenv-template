@@ -9,6 +9,7 @@
 }:
 let
   cfg = config.templateConfig.formatters;
+  mkHook = (import ../_lib.nix { inherit pkgs lib config; }).mkHook;
 in
 {
   options.templateConfig.formatters = {
@@ -61,17 +62,17 @@ in
 
     # git-hooks (devenv 2.x first-class): format + hygiene.
     # Hooks run from the raw `git commit` env (not the devenv shell), so
-    # treefmt can't find rustfmt/dprint by name — wrap the entry with a
-    # PATH containing every formatter it dispatches to.
+    # treefmt can't find rustfmt/dprint by name — wrap via mkHook.
     git-hooks.hooks = {
       treefmt = {
         enable = true;
         settings.fail-on-change = true;
         entry = ''
-          ${pkgs.writeShellScript "treefmt-hook" ''
-            export PATH="${lib.makeBinPath (with pkgs; [ treefmt rustfmt dprint typos ])}:$PATH"
-            exec ${pkgs.treefmt}/bin/treefmt --fail-on-change --no-cache "$@"
-          ''}
+          ${mkHook {
+            command = "${pkgs.treefmt}/bin/treefmt";
+            bins = with pkgs; [ treefmt rustfmt dprint typos ];
+            args = "--fail-on-change --no-cache";
+          }}
         '';
       };
       typos.enable = true;

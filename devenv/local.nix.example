@@ -1,9 +1,10 @@
-# Local, machine/project-specific overrides — NOT committed in a template
-# but this file documents the pattern. Create devenv/local.nix with your
-# overrides; it is gitignored.
+# Local, machine/project-specific overrides — NOT committed (gitignored),
+# but this file documents the pattern. Copy to devenv/local.nix.
 #
-# Example:
 # {
 #   templateConfig.ncro.enable = true;
 #   templateConfig.processes.enable = true;
+#   templateConfig.toggles.wasm.enable = true;  # opt-in langs
+#   templateConfig.toggles.python.enable = true;
+#   templateConfig.languages.rust.rustflags = [ "-C target-cpu=native" ];
 # }

@@ -1,14 +1,9 @@
-# JavaScript (node + bun). OPT-IN: templateConfig.languages.js.enable.
+# JavaScript (node + bun). OPT-IN toggle: see mkToggle.
 { pkgs, lib, config, ... }:
-let
-  cfg = config.templateConfig.languages.js;
-in
-{
-  options.templateConfig.languages.js.enable = lib.mkEnableOption "javascript (node + bun)" // {
-    default = false;
-  };
-
-  config = lib.mkIf cfg.enable {
+(import ../_lib.nix { inherit pkgs lib config; }).mkToggle {
+  name = "js";
+  description = "javascript (node + bun)";
+  mod = { ... }: {
     languages.javascript = {
       enable = true;
       package = pkgs.nodejs-slim;

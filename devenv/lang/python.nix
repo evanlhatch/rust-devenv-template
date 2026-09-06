@@ -1,20 +1,13 @@
-# Python — uv-managed (sheath pattern). OPT-IN: default off; enable with
-# templateConfig.languages.python.enable = true (in devenv/local.nix or
-# a project module).
+# Python — uv-managed (sheath pattern). OPT-IN toggle: see mkToggle.
 #
 # uv manages the venv at .venv (UV_PROJECT_ENVIRONMENT); devenv's sync task
 # runs `uv sync` with --active so it uses exactly that venv. uv never
 # downloads its own Python — nix provides the interpreter (managed).
 { pkgs, lib, config, ... }:
-let
-  cfg = config.templateConfig.languages.python;
-in
-{
-  options.templateConfig.languages.python.enable = lib.mkEnableOption "python (uv-managed)" // {
-    default = false;
-  };
-
-  config = lib.mkIf cfg.enable {
+(import ../_lib.nix { inherit pkgs lib config; }).mkToggle {
+  name = "python";
+  description = "python (uv-managed)";
+  mod = { ... }: {
     env.UV_PYTHON_DOWNLOADS = "never";
     env.UV_PYTHON_PREFERENCE = lib.mkForce "managed";
     env.UV_PROJECT_ENVIRONMENT = lib.mkForce "${config.env.DEVENV_ROOT}/.venv";

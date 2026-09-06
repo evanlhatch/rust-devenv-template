@@ -49,6 +49,37 @@ machete:
 mutants name:
 	cargo mutants -f {{name}}
 
+# ── Codegen loop (buf-style: watched = same command, wrapped) ────────
+# `gen`/`check`/`breaking` run identically in CI and in watchers. The
+# watcher never changes what runs, only when.
+
+# Emit wit/ + src/generated/ + wasm from the type-definition layer.
+# Placeholder impl — swap for steelc/lake when wired.
+gen:
+	@echo "TODO: steelc emit"
+
+# Fast type-check only, no emission (buf lint analog).
+check-schema:
+	@echo "TODO: steelc check"
+
+# Schema-compat diff vs last released schema (buf breaking analog).
+breaking:
+	@echo "TODO: schema diff"
+
+# Watchers — watchexec wraps the SAME commands, no redefinition.
+# --restart: kill in-flight gen on new save (codegen is idempotent).
+watch-gen:
+	watchexec -r -w lean -e lean -- just gen
+
+# Host restart on generated OUTPUTS + host code (not lean/ — the gen
+# write into src/generated is what triggers this, one write per change).
+watch-host:
+	watchexec -r -w src -w wit -- cargo run
+
+# Fast schema check without emission.
+watch-check:
+	watchexec -w lean -e lean -- just check-schema
+
 # Property/fuzz ingress boundary tests (bolero). Corpora live in
 # devenv state (DEVENV_STATE/bolero-corpus).
 fuzz name:
