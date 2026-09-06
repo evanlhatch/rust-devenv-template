@@ -1,0 +1,26 @@
+# Build artifacts
+/target/
+target-fix/
+
+# Nix / devenv
+.devenv*/
+.direnv/
+result*
+/pre-commit-config.yaml
+
+# Local env + secrets
+.env
+.secrets/
+
+# Editor / OS
+*.swp
+*.swo
+.DS_Store
+.idea/
+.vscode/
+
+# Node (if tooling needs it)
+node_modules/
+
+# Scratch
+/scratch/
