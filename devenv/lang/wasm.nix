@@ -55,7 +55,10 @@ in
       wabt # wasm2wat/wasm-validate debugging, wasm2c native-AOT
       wit-bindgen # generated bindings
       wac-cli # component composition
-      wasilibc # wasm32-wasi C runtime (pairs with nixpkgs wasm-component-ld to replace the wasi-sdk tarball)
+      # NOTE: nixpkgs `wasilibc` is cross-only (host platform must be a wasm
+      # target) — not a usable dev-shell package. The wasi-libc sysroot for
+      # linking still comes from a wasi-sdk fetch (wasmtron pattern). Removed
+      # from packages for that reason.
     ]
     ++ lib.optionals cfg.enableSplicer [
       # packaged upstream in wasmtron — copy that derivation when needed
