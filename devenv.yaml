@@ -12,10 +12,9 @@ inputs:
             nixpkgs:
                 follows: nixpkgs
 
-# SecretSpec: secrets declared in secretspec.toml, provisioned per env.
-# Best practice (devenv docs): load at RUNTIME via `secretspec run -- <cmd>`
-# — never export into the shell env. Provider: dotenv = repo-root .env
-# (gitignored); swap to keyring/1password without touching consumers.
+# SecretSpec: secrets declared in secretspec.toml (see that file for
+# providers). Load at RUNTIME via `secretspec run -- <cmd>` — never export
+# into the shell env. dotenv = repo-root .env (gitignored).
 secretspec:
     enable: true
     provider: dotenv
