@@ -1,10 +1,22 @@
-# Workspace-wide Clippy configuration.
-#
-# Add project-specific `disallowed-methods` / `disallowed-types` here as
-# the project accrues invariants — every entry names its replacement.
+# Workspace-wide Clippy thresholds + banned APIs.
 
-# Example (from real projects — uncomment and adapt):
-# disallowed-methods = [
-#     { path = "std::time::Instant::now", reason = "use the crate clock facade; std Instant panics on wasm32" },
-#     { path = "std::time::SystemTime::now", reason = "wall-clock never appears in output; use the crate clock for elapsed" },
-# ]
+# Thresholds (shadow-empire values).
+cognitive-complexity-threshold = 15
+too-many-arguments-threshold = 7
+too-many-lines-threshold = 200
+
+# Deterministic iteration: std HashMap/HashSet are banned — use ahash.
+disallowed-types = [
+    { path = "std::collections::HashMap", reason = "use ahash::HashMap for deterministic iteration" },
+    { path = "std::collections::HashSet", reason = "use ahash::HashSet" },
+]
+
+# fast-observe is the error tool: no direct unwrap/expect. Flow with `?`
+# or fast-observe's or_raise()/ensure!. (Lints already deny unwrap_used/
+# expect_used; this catches method calls on values too.)
+disallowed-methods = [
+    { path = "std::result::Result::unwrap", reason = "use ? or .or_raise() with fast-observe" },
+    { path = "std::result::Result::expect", reason = "use ? or .or_raise() with fast-observe" },
+    { path = "std::option::Option::unwrap", reason = "use ? or .or_raise() with fast-observe" },
+    { path = "std::option::Option::expect", reason = "use ? or .or_raise() with fast-observe" },
+]

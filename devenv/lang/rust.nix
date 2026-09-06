@@ -1,3 +1,4 @@
+# Rust language module — always on.
 { pkgs, config, lib, ... }:
 {
   languages.rust = {
@@ -15,8 +16,15 @@
       "llvm-tools-preview"
     ];
 
-    # Build flags (dev). NOTE: no -fuse-ld flag — the linker is managed by
-    # devenv's native languages.rust.wild.enable option, not via RUSTFLAGS.
+    # Build flags in two sets (sheath pattern):
+    #   RUSTFLAGS      — normal builds (nightly-only speed flags included)
+    #   RUSTFLAGS_FIX  — cargo fix / clippy --fix (no -Zthreads; the
+    #                    re-entrant subprocess lock model in cargo fix
+    #                    conflicts with parallel frontend threads).
+    # NOTE: no -fuse-ld flag — the linker is managed by devenv's
+    # languages.rust.wild.enable option, not via RUSTFLAGS.
+    # NOTE: -C debuginfo is NOT set here — per-package profile overrides in
+    # Cargo.toml control it (deps get none, workspace crates line-tables).
     rustflags = lib.concatStringsSep " " [
       "-C lto=off"
       "-C codegen-units=256"
@@ -29,43 +37,80 @@
       "-C target-cpu=native"
     ];
 
-    # Use `wild` as the linker (fast, drop-in). Managed by devenv itself —
-    # no mold, no -fuse-ld in RUSTFLAGS.
     wild.enable = true;
   };
 
   # ── Rust infrastructure packages ──────────────────────────────────
   packages = with pkgs; [
+    cmake
     cargo-sweep
+
+    # Toolchain support
+    libclang # bindgen dlopens libclang at build time
+    llvmPackages.libllvm # bolero libFuzzer backend
+    llvmPackages.libclang
+
+    # Testing
     cargo-nextest
-    cargo-llvm-cov
-    cargo-expand
+
+    # Development
+    bacon # TDD watch mode
+    cargo-watch
+
+    # Dependency management
     cargo-edit
     cargo-outdated
     cargo-machete
     cargo-deny
+
+    # Analysis
     cargo-hack
     cargo-bloat
+    cargo-llvm-lines
+    cargo-expand
+
+    # Property testing
     cargo-bolero
-    cargo-watch
-    bacon
+
+    # Mutation testing
     cargo-mutants
+
+    # Build cache (server starts on demand; no daemon)
+    sccache
   ];
 
   # ── Environment ────────────────────────────────────────────────
-  # RUSTFLAGS is derived by devenv from languages.rust.rustflags (+ wild linker).
-  # RUSTFLAGS_FIX: flag set for cargo fix / clippy --fix (no -Zthreads — the
-  # re-entrant subprocess lock model conflicts with parallel frontend threads).
-  env.RUSTFLAGS_FIX = lib.mkForce (lib.concatStringsSep " " [
-    "-C lto=off"
-    "-C codegen-units=256"
-    "-C opt-level=1"
-    "-Zshare-generics=y"
-    "-C target-cpu=native"
-  ]);
+  env = {
+    LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
+
+    RUSTFLAGS_FIX = lib.mkForce (lib.concatStringsSep " " [
+      "-C lto=off"
+      "-C codegen-units=256"
+      "-C opt-level=1"
+      "-Zshare-generics=y"
+      "-C target-cpu=native"
+    ]);
+
+    # RUSTC_WRAPPER intentionally not set — workspaces manage sccache via
+    # .cargo/config.toml (avoids "server not running"; starts on demand).
+
+    # nexttest default runner
+    CARGO_TEST_RUNNER = "nextest";
+    NEXTEST_PROFILE = "default";
+
+    # bolero
+    BOLERO_LIBFUZZER_PATH = "${pkgs.llvmPackages.libllvm}/lib/libLLVM.so";
+    BOLERO_FUZZER = "libfuzzer";
+    BOLERO_CORPUS_DIR = "${config.env.DEVENV_STATE}/bolero-corpus";
+  };
 
   # ── Utility scripts ───────────────────────────────────────────────
   scripts = {
+    # cargo fix with RUSTFLAGS_FIX (no -Zthreads — avoids lock server
+    # timeout from re-entrant cargo rustc subprocess + parallel frontend).
+    # Separate target dir (target-fix) avoids IPC conflicts with the cached
+    # incremental state; CARGO_INCREMENTAL=0 prevents incremental lock
+    # contention.
     cargo-fix.exec = ''
       RUSTFLAGS="$RUSTFLAGS_FIX" CARGO_INCREMENTAL=0 CARGO_TARGET_DIR="${config.env.DEVENV_ROOT}/target-fix" cargo fix --allow-dirty "$@"
     '';
@@ -74,10 +119,11 @@
     '';
   };
 
-  # ── Pre-commit hooks ──────────────────────────────────────────────
+  # ── Pre-commit hooks (format/hygiene live in dev/formatters.nix) ──
   pre-commit.hooks = {
-    rustfmt.enable = true;
     clippy.enable = true;
+    check-merge-conflicts.enable = true;
+    forbid-new-submodules.enable = true;
     cargo-deny = {
       enable = true;
       entry = "${pkgs.cargo-deny}/bin/cargo-deny check";

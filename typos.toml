@@ -1,0 +1,5 @@
+# typos config — `just typos` / CI. Add project words here as needed.
+[default.extend-words]
+
+[files]
+extend-exclude = ["target", "target-fix"]

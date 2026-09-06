@@ -1,23 +1,27 @@
-{ pkgs, config, inputs, lib, ... }:
+# Shell entrypoint — auto-discovers all modules under ./devenv/ (sheath
+# pattern). New modules are picked up with no wiring; prefix a file/dir
+# with `_` to exclude it. Each module gates itself via options.
+
+{ pkgs, lib, inputs, ... }:
+let
+  # Auto-discover devenv modules.
+  findModules =
+    dir:
+    let
+      entries = builtins.readDir dir;
+      processEntry =
+        name: type:
+        if builtins.hasPrefix "_" name then
+          [ ]
+        else if type == "directory" then
+          findModules (dir + "/${name}")
+        else if builtins.hasSuffix ".nix" name then
+          [ (dir + "/${name}") ]
+        else
+          [ ];
+    in
+    lib.flatten (lib.mapAttrsToList processEntry entries);
+in
 {
-  # ── Languages — enable per project. ─────────────────────────────
-  imports = [
-    ./devenv/lang/rust.nix
-    ./devenv/lang/lean.nix
-    # ./devenv/lang/wasm.nix   # WASM component tooling
-    # ./devenv/lang/js.nix     # node + bun
-  ];
-
-  # ── System packages ─────────────────────────────────────────────
-  packages = with pkgs; [
-    jujutsu
-    just
-    ripgrep
-    difftastic
-    yek # repo → LLM context packer (respects yek.yaml + .gitignore)
-  ];
-
-  enterShell = ''
-    echo "🦀 devenv ready"
-  '';
+  imports = findModules ./devenv;
 }

@@ -11,11 +11,15 @@ license = "MIT OR Apache-2.0"
 fast-observe = "0.1"
 log = { version = "0.4", features = ["kv"] }
 
+# Async: runtime-agnostic concurrency building blocks
+asyncband = "0.7"
+
 # Data structures
 parking_lot = "0.12"
 arc-swap = "1.7"
 ecow = "0.3" # clone-on-write vec/string/bytes — prefer over smallvec
 itertools = "0.14"
+ahash = "0.8" # HashMap/HashSet — deterministic iteration (std banned in clippy.toml)
 
 # Derive / ergonomics
 bon = "3" # builder patterns
@@ -33,10 +37,13 @@ insta = "1" # snapshot tests
 bolero = "0.13" # property/fuzz tests
 
 [lints.rust]
+# Fail on lints we don't know about (nightly gains them regularly).
+unknown_lints = "deny"
 unsafe_code = "deny"
-unused_imports = "warn"
+unused_imports = "deny"
 unused_variables = "warn"
 dead_code = "warn"
+non_ascii_idents = "deny"
 unconditional_recursion = "deny"
 redundant_semicolons = "deny"
 unused_must_use = "deny"
@@ -48,20 +55,44 @@ variant_size_differences = "deny"
 [lints.clippy]
 all = { level = "warn", priority = -1 }
 pedantic = { level = "warn", priority = -1 }
-unwrap_used = "warn"
+# Deny anti-patterns
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+dbg_macro = "deny"
+todo = "deny"
+unwrap_in_result = "deny"
+enum_glob_use = "deny"
+
+# Doc / types
 missing_docs_in_private_items = "warn"
 missing_errors_doc = "warn"
 missing_panics_doc = "warn"
 wildcard_enum_match_arm = "warn"
 use_self = "warn"
-unnecessary_wraps = "warn"
-semicolon_if_nothing_returned = "warn"
 unnecessary_literal_unwrap = "warn"
 trait_duplication_in_bounds = "warn"
 string_slice = "warn"
-expect_used = "warn"
-panic = "deny"
-dbg_macro = "deny"
+fallible_impl_from = "deny"
+large_enum_variant = "deny"
+must_use_candidate = "warn"
+
+# Type-safety: no silent narrowing
+cast_possible_truncation = "deny"
+cast_possible_wrap = "deny"
+cast_sign_loss = "warn"
+as_conversions = "warn"
+
+# Complexity
+cognitive_complexity = "deny"
+too_many_arguments = "warn"
+too_many_lines = "warn"
+
+# Style
+module_name_repetitions = "warn"
+redundant_closure = "warn"
+unnecessary_wraps = "warn"
+semicolon_if_nothing_returned = "warn"
 
 # ── Fast-fail over silent fallback ──────────────────────────────────
 # .unwrap_or(f()) should be .unwrap_or_else(|| f()) for non-const fns.

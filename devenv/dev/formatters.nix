@@ -1,0 +1,69 @@
+# Formatters and linters config (sheath formatters.nix pattern).
+# Tool installation + the manual treefmt.toml wiring. Everything gated
+# by options so a project can trim without deleting files.
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
+let
+  cfg = config.templateConfig.formatters;
+in
+{
+  options.templateConfig.formatters = {
+    enable = lib.mkEnableOption "formatters and linters" // {
+      default = true;
+    };
+
+    enableDprint = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Enable dprint (JSON/TOML/YAML/MD via .dprint.json plugin URLs).";
+    };
+
+    enableTypos = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Enable typos spell-checker.";
+    };
+
+    enableRipsecrets = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Enable ripsecrets secret scanner.";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    packages =
+      (with pkgs; [
+        # Core formatters (used by treefmt.toml)
+        treefmt
+        rustfmt
+      ])
+      ++ lib.optionals cfg.enableDprint [
+        pkgs.dprint # reads .dprint.json (plugin URLs, shadow-empire pattern)
+      ]
+      ++ lib.optionals cfg.enableTypos [
+        pkgs.typos
+      ]
+      ++ lib.optionals cfg.enableRipsecrets [
+        pkgs.ripsecrets
+      ];
+
+    # ── Manual treefmt config (repo root), not treefmt-nix generation ──
+    # Point treefmt at it and disable devenv's auto-generated task.
+    enterShell = ''
+      export TREEFMT_CONFIG="$DEVENV_ROOT/treefmt.toml"
+    '';
+    tasks."devenv:treefmt:run".before = lib.mkForce [ ];
+
+    # Pre-commit: format + hygiene (code checks live in lang/rust.nix).
+    pre-commit.hooks = {
+      treefmt.enable = true;
+      typos.enable = true;
+      ripsecrets.enable = true;
+    };
+  };
+}

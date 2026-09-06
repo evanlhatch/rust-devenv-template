@@ -1,7 +1,7 @@
 # Verification recipes
 
-# Full check: tests, clippy, fmt.
-check: test clippy fmt
+# Full check: tests, clippy, fmt, typos, secrets.
+check: test clippy fmt typos secrets
 
 # nextest is the default runner. nextest does not run doctests —
 # they run separately (flatland pattern).
@@ -14,6 +14,18 @@ clippy:
 
 fmt:
 	cargo fmt --check
+
+# Everything formatter: rustfmt + dprint (treefmt.toml + .dprint.json).
+format:
+	treefmt
+
+# Spell-check (typos.toml).
+typos:
+	typos
+
+# Secret scanner (ripsecrets).
+secrets:
+	ripsecrets
 
 # Auto-fix lint/format findings (separate target dir, no -Zthreads).
 fix:

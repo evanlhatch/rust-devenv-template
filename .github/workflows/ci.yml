@@ -29,3 +29,5 @@ jobs:
         run: devenv shell -- bash -c 'just clippy'
       - name: fmt
         run: devenv shell -- bash -c 'just fmt'
+      - name: typos
+        run: devenv shell -- bash -c 'just typos'

@@ -1,11 +1,7 @@
-pub fn hello() -> &'static str {
-    "hello"
-}
+//! Crate root. Feature gates for fast-observe are declared here —
+//! nightly features, tracked in fast-observe's README.
+#![feature(error_generic_member_access)]
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn hello() {
-        assert_eq!(super::hello(), "hello");
-    }
-}
+pub mod errors;
+
+pub use errors::AppError;

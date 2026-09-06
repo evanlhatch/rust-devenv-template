@@ -1,0 +1,9 @@
+# Local, machine/project-specific overrides — NOT committed in a template
+# but this file documents the pattern. Create devenv/local.nix with your
+# overrides; it is gitignored.
+#
+# Example:
+# {
+#   templateConfig.ncro.enable = true;
+#   templateConfig.processes.enable = true;
+# }
