@@ -1,4 +1,4 @@
-# cargo-deny config — tune advisories/bans/licenses per project.
+# cargo-deny config — run: cargo deny check (pre-commit hook + just deny).
 
 [advisories]
 version = 2
@@ -6,7 +6,19 @@ yanked = "deny"
 
 [licenses]
 version = 2
-allow = ["MIT", "Apache-2.0", "Unicode-3.0", "BSD-3-Clause", "Zlib"]
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "0BSD",
+    "Zlib",
+    "BSL-1.0",
+    "Unicode-3.0",
+    "CC0-1.0",
+    "MPL-2.0",
+]
 
 [bans]
 multiple-versions = "warn"
