@@ -1,9 +1,7 @@
 # Rust language module — always on.
 { pkgs, config, lib, ... }:
 let
-  lib' = import ../_lib.nix { inherit pkgs lib config; };
-  mkHook = lib'.mkHook;
-  mkToggle = lib'.mkToggle;
+  mkHook = import ../dev/_hooks.nix pkgs lib;
 in
 {
   languages.rust = {
@@ -98,16 +96,6 @@ in
 
     # RUSTC_WRAPPER intentionally not set — workspaces manage sccache via
     # .cargo/config.toml (avoids "server not running"; starts on demand).
-
-    # WASM builds: the dev rustflags carry `-C target-cpu=native` + host
-    # -Z flags that break wasm targets. Use this set instead (wasmtron
-    # pattern) via `just check-wasip3` / `just check-wasm`.
-    RUSTFLAGS_WASIP3 = lib.concatStringsSep " " [
-      "-C lto=no"
-      "-C panic=abort"
-      "-C debuginfo=1"
-    ];
-    RUSTFLAGS_WASM32 = "-C lto=no -C panic=abort -C debuginfo=1";
 
     # nexttest default runner
     CARGO_TEST_RUNNER = "nextest";

@@ -86,10 +86,15 @@ fuzz name:
 	cargo bolero run {{name}}
 
 # ── WASM compile checks (nightly + rust-src required) ────────────────
-# RUSTFLAGS_WASIP3/RUSTFLAGS_WASM32 strip host-only flags (target-cpu=native,
-# -Z*); these are the real gates for "does it build for wasm" without a link.
+# RUSTFLAGS_WASIP3/RUSTFLAGS_WASM32 (devenv/lang/wasm.nix) strip host-only
+# flags (target-cpu=native, -Z*) and add the wasip3 linker + sysroot.
 check-wasip3:
 	RUSTFLAGS="$RUSTFLAGS_WASIP3" cargo check --target wasm32-wasip3 -Z build-std=std,panic_abort
+
+# Full wasip3 link — the real gate (wasm-component-ld + wasi-libc sysroot,
+# both from nixpkgs; no wasi-sdk tarball).
+wasm-build:
+	RUSTFLAGS="$RUSTFLAGS_WASIP3" cargo build --target wasm32-wasip3 -Z build-std=std,panic_abort
 
 check-wasm:
 	RUSTFLAGS="$RUSTFLAGS_WASM32" cargo check --target wasm32-unknown-unknown
