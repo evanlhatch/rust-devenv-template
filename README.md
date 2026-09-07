@@ -22,5 +22,11 @@ then `devenv allow` in the project.
   profiles — activate with `devenv --profile wasm shell` (compose flags;
   no config needed).
 - **Per-machine overrides**: `devenv.local.nix` (gitignored).
-- **wasm**: `just check-wasip3` (check) / `just wasm-build` (full link);
-  needs the vendored getrandom patch (see Cargo.toml `[patch.crates-io]`).
+- **Binary caches**: ncro proxy (localhost:8080) is on by default and
+  races the upstream caches — start it with `devenv up` (plain
+  `devenv shell` does not run processes; nix falls back to the direct
+  upstreams when ncro is down).
+- **wasm**: `just check-wasip3` (check) / `just wasm-build` (full
+  component link, proven via the nix-built wasi-libc wasip3 sysroot —
+  see `devenv/lang/wasm.nix`); needs the vendored getrandom patch (see
+  Cargo.toml `[patch.crates-io]`).
