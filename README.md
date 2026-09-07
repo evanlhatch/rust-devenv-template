@@ -18,8 +18,9 @@ then `devenv allow` in the project.
 ## Conventions (short version)
 
 - **Errors**: fast-observe only — no thiserror/anyhow/eyre.
-- **Lang toggles**: opt-in languages live in `devenv/lang/`, gated by
-  `templateConfig.toggles.<name>.enable` (set in `devenv.local.nix`).
+- **Lang profiles**: opt-in languages live in `devenv/lang/` as devenv
+  profiles — activate with `devenv --profile wasm shell` (compose flags;
+  no config needed).
 - **Per-machine overrides**: `devenv.local.nix` (gitignored).
-- **wasm**: `just check-wasip3` / `just check-wasm`; needs the vendored
-  getrandom patch (see Cargo.toml `[patch.crates-io]`).
+- **wasm**: `just check-wasip3` (check) / `just wasm-build` (full link);
+  needs the vendored getrandom patch (see Cargo.toml `[patch.crates-io]`).

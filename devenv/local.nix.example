@@ -1,10 +1,16 @@
 # Local, machine/project-specific overrides — NOT committed (gitignored),
-# but this file documents the pattern. Copy to devenv/local.nix.
+# but this file documents the pattern. Copy to devenv.local.nix.
+#
+# Opt-in languages are devenv PROFILES (see devenv/lang/*.nix) — activated
+# on the CLI, no config needed:
+#
+#   devenv --profile wasm shell
+#   devenv --profile wasm --profile python shell
+#
+# Example local overrides (devenv.local.nix is a devenv module):
 #
 # {
-#   templateConfig.ncro.enable = true;
-#   templateConfig.processes.enable = true;
-#   templateConfig.toggles.wasm.enable = true;  # opt-in langs
-#   templateConfig.toggles.python.enable = true;
-#   templateConfig.languages.rust.rustflags = [ "-C target-cpu=native" ];
+#   templateConfig.ncro.enable = false;         # direct upstream caches
+#   templateConfig.processes.enable = true;     # example processes block
+#   templateConfig.formatters.enableDprint = false;
 # }

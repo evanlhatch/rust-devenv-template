@@ -9,7 +9,7 @@
 }:
 let
   cfg = config.templateConfig.formatters;
-  mkHook = (import ../_lib.nix { inherit pkgs lib config; }).mkHook;
+  mkHook = import ./_hooks.nix pkgs lib;
 in
 {
   options.templateConfig.formatters = {
