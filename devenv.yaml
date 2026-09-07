@@ -11,6 +11,11 @@ inputs:
         inputs:
             nixpkgs:
                 follows: nixpkgs
+    ncro:
+        url: github:feel-co/ncro
+        inputs:
+            nixpkgs:
+                follows: nixpkgs
 
 # Enforce a recent CLI: `.envrc` eval-cache + `devenv hook` need >= 2.1.
 require_version: ">=2.2"

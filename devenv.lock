@@ -54,6 +54,26 @@
         "type": "github"
       }
     },
+    "ncro": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788018155,
+        "narHash": "sha256-TB3Q6xpaV7APiC6qAM4ENV6MNuUjR4OgatQtj88PBWY=",
+        "owner": "feel-co",
+        "repo": "ncro",
+        "rev": "a367692d67bed3225d64fed0fffefed141927fd3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "feel-co",
+        "repo": "ncro",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "inputs": {
         "nixpkgs-src": "nixpkgs-src"
@@ -94,6 +114,7 @@
       "inputs": {
         "devenv": "devenv",
         "git-hooks": "git-hooks",
+        "ncro": "ncro",
         "nixpkgs": "nixpkgs",
         "rust-overlay": "rust-overlay"
       }
