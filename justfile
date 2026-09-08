@@ -3,10 +3,11 @@
 # Full check: tests, clippy, fmt, typos, secrets.
 check: test clippy fmt typos secrets
 
-# nextest is the default runner. nextest does not run doctests —
-# they run separately (flatland pattern).
+# nextest is the default runner (--no-tests=pass: templates start with
+# zero tests; nextest would otherwise exit 4 and fail `just check`).
+# nextest does not run doctests — they run separately (flatland pattern).
 test:
-	cargo nextest run && cargo test --doc
+	cargo nextest run --no-tests=pass && cargo test --doc
 
 clippy:
 	cargo clippy --all-targets
